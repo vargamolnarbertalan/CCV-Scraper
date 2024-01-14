@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCV for
+        <%=ejsdata.channel%>
+    </title>
+    <link rel="stylesheet" href="/css/normalize.css">
+    <link rel="stylesheet" href="/css/generic.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@600&display=swap" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+</head>
+
+<body>
+
+    <div class="container" data-channel="<%=ejsdata.channel%>">
+        <%=ejsdata.viewers%>
+    </div>
+
+
+
+</body>
+
+<script>
+    function refreshViewers() {
+        const channel = $('.container').data('channel')
+        $.ajax({
+            type: "POST",
+            url: "/refresh",
+            data: {
+                'channel': channel
+            },
+            success: function(data, status, xhr) {
+                console.log(`response status code: ${xhr.status} | response text: ${xhr.responseText}`)
+
+                $('.container').text(data)
+            },
+            error: function(xhr, status, error) {
+
+                console.log(`response status code: ${xhr.status} | response text: ${xhr.responseText}`)
+
+            }
+        })
+    }
+    $(document).ready(function() {
+        const intervalId = setInterval(refreshViewers, 60000)
+
+    })
+</script>
+
+</html>
