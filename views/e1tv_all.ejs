@@ -4,9 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CCV for
-        <%=ejsdata.channel%>
-    </title>
+    <title>CCV for all E1TVs</title>
     <link rel="stylesheet" href="/css/normalize.css">
     <link rel="stylesheet" href="/css/generic.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,13 +16,17 @@
 
 <body>
 
-    <div class="container" data-channel="<%=ejsdata.channel%>">
-        <p style="color:aliceblue">
-            <%= ejsdata.channel%>
-        </p>
-        <p>
-            <%= ejsdata.viewers%>
-        </p>
+    <div class="container-all" data-channel="<%=ejsdata.channel%>">
+        <%=ejsdata.viewers%>
+            <% for (let i = 0; i < ejsdata.length; i++) { %>
+                <p style="color:aliceblue">
+                    <%= ejsdata[i].channel%>
+                </p>
+                <p>
+                    <%= ejsdata[i].viewers%>
+                </p>
+                <br>
+                <% } %>
     </div>
 
 

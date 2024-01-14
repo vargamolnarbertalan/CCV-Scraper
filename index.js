@@ -31,17 +31,52 @@ async function main() {
 
     // GET REQUESTS
 
-    app.get('/:channel', (req, res) => {
+    app.get('/twitch/:channel', (req, res) => {
         const channel = req.params.channel
-            //console.log(channel)
-        scraper(channel).then(el => {
-            const ejsdata = {
-                channel: channel,
-                viewers: el.msg
-            }
-            console.log(ejsdata)
-            res.render('default', { ejsdata })
+        if (channel != 'favicon.ico') {
+            scraper(channel).then(el => {
+                const ejsdata = {
+                    channel: channel,
+                    viewers: el.msg
+                }
+                res.render('default', { ejsdata })
+            })
+        }
+    })
+
+    app.get('/e1tv_all', (req, res) => {
+        const channels = ['esport1tv', 'esport2tv', 'esport3tv', 'esport4tv']
+        var ejsdata = []
+
+        scraper(channels[0]).then(el0 => {
+            ejsdata.push({
+                channel: channels[0],
+                viewers: el0.msg
+            })
+            scraper(channels[1]).then(el1 => {
+                ejsdata.push({
+                    channel: channels[1],
+                    viewers: el1.msg
+                })
+                scraper(channels[2]).then(el2 => {
+                    ejsdata.push({
+                        channel: channels[2],
+                        viewers: el2.msg
+                    })
+                    scraper(channels[3]).then(el3 => {
+                        ejsdata.push({
+                            channel: channels[3],
+                            viewers: el3.msg
+                        })
+                        console.log(ejsdata)
+                        res.render('e1tv_all', { ejsdata })
+                    })
+                })
+            })
         })
+
+
+
     })
 
     // POST REQUESTS
@@ -81,9 +116,7 @@ async function scraper(channel) {
             'value': authToken
         }]
 
-        const context = await browser.createIncognitoBrowserContext()
-        const page = await context.newPage()
-
+        var [page] = await browser.pages()
         await page.goto('https://twitch.tv/' + channel)
         await page.evaluate(() => {
             localStorage.setItem('mature', 'true')
@@ -94,19 +127,27 @@ async function scraper(channel) {
 
         await page.setViewport({ width: 1280, height: 720 })
 
-        await page.setCookie(...cookies)
-        await page.reload({
-            waitUntil: ["networkidle2", "domcontentloaded"]
-        })
 
-        await page.waitForSelector('[data-a-target="animated-channel-viewers-count"]')
-        var viewers = await page.$eval('[data-a-target="animated-channel-viewers-count"]', el => el.textContent)
-        await browser.close()
-        console.log('viewers on ' + channel + ': ' + viewers)
-        return resolve({
-            msg: viewers,
-            status: 200
-        })
+        await page.setCookie(...cookies)
+            // await page.reload({waitUntil: ["networkidle2", "domcontentloaded"]})
+        await page.setDefaultTimeout(1000)
+        try {
+            await page.waitForSelector('[data-a-target="animated-channel-viewers-count"]')
+            var viewers = await page.$eval('[data-a-target="animated-channel-viewers-count"]', el => el.textContent)
+            await browser.close()
+            console.log('viewers on ' + channel + ': ' + viewers)
+            return resolve({
+                msg: viewers,
+                status: 200
+            })
+        } catch (e) {
+            console.log('viewers on ' + channel + ': ' + 'offline')
+            return resolve({
+                msg: 'offline',
+                status: 200
+            })
+        }
+
     })
 }
 
