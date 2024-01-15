@@ -38,9 +38,10 @@
 
     function crawlData() {
         const channel = $('.container').attr('data-channel')
+        console.log(channel)
         $.ajax({
             type: "POST",
-            url: "/refresh_twitch",
+            url: "/refresh_yt",
             data: {
                 'channel': channel
             },

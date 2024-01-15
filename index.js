@@ -34,27 +34,29 @@ async function main() {
     app.get('/twitch/:channel', (req, res) => {
         const channel = req.params.channel
         if (channel != 'favicon.ico') {
-            scraper(channel).then(el => {
-                const ejsdata = {
-                    channel: channel,
-                    viewers: el.msg
-                }
-                res.render('default', { ejsdata })
-            })
+            const ejsdata = {
+                channel: channel
+            }
+            res.render('default', { ejsdata })
         }
     })
 
     app.get('/yt/:channel', (req, res) => {
         const channel = req.params.channel
         if (channel != 'favicon.ico') {
-            yTscraper(channel).then(el => {
-                const ejsdata = {
-                    channel: channel,
-                    viewers: el.msg
-                }
-                res.render('default', { ejsdata })
-            })
+            const ejsdata = {
+                channel: channel
+            }
+            res.render('default_yt', { ejsdata })
         }
+    })
+
+    app.get('/twitch/:channel/yt/:channel2', (req, res) => {
+        const channels = [req.params.channel, req.params.channel2]
+        const ejsdata = {
+            channels: channels
+        }
+        res.render('yt_twitch', { ejsdata })
     })
 
     app.get('/e1tv_all', (req, res) => {
@@ -94,12 +96,34 @@ async function main() {
 
     // POST REQUESTS
 
-    app.post('/refresh', (req, res) => {
+    app.post('/refresh_twitch', (req, res) => {
         const channel = req.body.channel
             //onsole.log(channel)
         scraper(channel).then(el => {
             res.send(el.msg).status(200)
         })
+    })
+
+    app.post('/refresh_yt', (req, res) => {
+        const channel = req.body.channel
+            //onsole.log(channel)
+        yTscraper(channel).then(el => {
+            res.send(el.msg).status(200)
+        })
+    })
+
+    app.post('/refresh_duo', (req, res) => {
+        const channels = [req.body.channel0, req.body.channel1]
+        console.log(channels)
+        scraper(channels[0]).then(el0 => {
+            var data = []
+            data.push(el0.msg)
+            yTscraper(channels[1]).then(el1 => {
+                data.push(el1.msg)
+                res.send(data).status(200)
+            })
+        })
+
     })
 
     // RUN

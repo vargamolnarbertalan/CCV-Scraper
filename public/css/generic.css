@@ -23,3 +23,11 @@ body {
     font-size: 7vh;
     margin-top: 5vh;
 }
+
+.container-duo {
+    width: 100%;
+    height: 100%;
+    margin: auto;
+    font-size: 15vh;
+    margin-top: 10vh;
+}

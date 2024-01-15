@@ -4,8 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CCV for
-        <%=ejsdata.channel%>
+    <title>CCV for 2 channels
     </title>
     <link rel="stylesheet" href="/css/normalize.css">
     <link rel="stylesheet" href="/css/generic.css">
@@ -18,7 +17,7 @@
 
 <body>
 
-    <div class="container" data-channel="<%=ejsdata.channel%>">
+    <div class="container-duo" data-channels="<%=ejsdata.channels%>">
         <p style="color:aliceblue">
             Loading
         </p>
@@ -36,28 +35,41 @@
         location.reload()
     }
 
-    function crawlData() {
-        const channel = $('.container').attr('data-channel')
+    function crawlData2() {
+        const channels = ($('.container-duo').attr('data-channels')).split(',')
+        console.log(channels)
         $.ajax({
             type: "POST",
-            url: "/refresh_twitch",
+            url: "/refresh_duo",
             data: {
-                'channel': channel
+                'channel0': channels[0],
+                'channel1': channels[1]
             },
             success: function(data, status, xhr) {
-                $(".container > p:nth-child(1)").text(channel)
-                $(".container > p:nth-child(2)").text(data)
-                console.log(`response status code: ${xhr.status} | response text: ${xhr.responseText}`)
+                $(".container-duo").empty()
+                for (var i = 0; i < data.length; i++) {
+                    $(".container-duo").append(`
+                        <p style="color:aliceblue">
+                            ${channels[i]}
+                        </p>
+                        <p>
+                            ${data[i]}
+                        </p>
+                        `)
+                    console.log(`response status code: ${xhr.status} | response text: ${xhr.responseText}`)
+                }
+
             },
             error: function(xhr, status, error) {
                 // Handle errors
                 console.log(`response status code: ${xhr.status} | response text: ${xhr.responseText}`)
             }
         })
+
     }
     $(document).ready(function() {
-        crawlData()
-        const intervalId = setInterval(crawlData, 60000)
+        crawlData2()
+        const intervalId = setInterval(crawlData2, 60000)
 
     })
 </script>
