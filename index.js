@@ -44,6 +44,19 @@ async function main() {
         }
     })
 
+    app.get('/yt/:channel', (req, res) => {
+        const channel = req.params.channel
+        if (channel != 'favicon.ico') {
+            yTscraper(channel).then(el => {
+                const ejsdata = {
+                    channel: channel,
+                    viewers: el.msg
+                }
+                res.render('default', { ejsdata })
+            })
+        }
+    })
+
     app.get('/e1tv_all', (req, res) => {
         const channels = ['esport1tv', 'esport2tv', 'esport3tv', 'esport4tv']
         var ejsdata = []
@@ -147,6 +160,51 @@ async function scraper(channel) {
                 status: 200
             })
         }
+
+    })
+}
+
+async function yTscraper(channel) {
+    return new Promise(async(resolve, reject) => {
+        const authToken = ""
+
+        console.log('checking view count on ' + channel + ' YT')
+        const browser = await puppeteer.launch({
+            headless: 'new', // 'new', false
+            defaultViewport: null,
+            args: ['--start-maximized'],
+            executablePath: __dirname + '/Chrome/Application/chrome.exe' // Windows
+                // executablePath: '/usr/bin/google-chrome-stable' // Linux
+        })
+
+        var [page] = await browser.pages()
+        await page.goto('https://www.youtube.com/@' + channel + '/streams')
+
+        await page.setViewport({ width: 1280, height: 720 })
+        await page.waitForSelector('form:nth-child(3) > div > div > button')
+        await page.click('form:nth-child(3) > div > div > button')
+
+        await page.setDefaultTimeout(5000)
+        try {
+            await page.waitForSelector('[overlay-style="LIVE"]')
+            await page.click('[overlay-style="LIVE"]')
+        } catch (e) {
+            await browser.close()
+            console.log('viewers on ' + channel + ': ' + 'offline')
+            return resolve({
+                msg: 'offline',
+                status: 200
+            })
+        }
+        await page.waitForSelector("#count > ytd-video-view-count-renderer > span.view-count.style-scope.ytd-video-view-count-renderer")
+        var viewers = await page.$eval("#count > ytd-video-view-count-renderer > span.view-count.style-scope.ytd-video-view-count-renderer", el => el.textContent)
+        viewers = viewers.replace(/[^0-9]/g, '')
+        await browser.close()
+        console.log('viewers on ' + channel + ' YT: ' + viewers)
+        return resolve({
+            msg: viewers,
+            status: 200
+        })
 
     })
 }
