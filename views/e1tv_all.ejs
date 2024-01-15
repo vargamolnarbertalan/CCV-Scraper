@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CCV for all E1TVs</title>
+    <title>CCV for all E1TVs
+    </title>
     <link rel="stylesheet" href="/css/normalize.css">
     <link rel="stylesheet" href="/css/generic.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,17 +17,13 @@
 
 <body>
 
-    <div class="container-all" data-channel="<%=ejsdata.channel%>">
-        <%=ejsdata.viewers%>
-            <% for (let i = 0; i < ejsdata.length; i++) { %>
-                <p style="color:aliceblue">
-                    <%= ejsdata[i].channel%>
-                </p>
-                <p>
-                    <%= ejsdata[i].viewers%>
-                </p>
-                <br>
-                <% } %>
+    <div class="container-all" data-channels="<%=ejsdata.channels%>">
+        <p style="color:aliceblue">
+            Loading
+        </p>
+        <p>
+
+        </p>
     </div>
 
 
@@ -37,8 +34,46 @@
     function forceReload() {
         location.reload()
     }
+
+    function crawlData3() {
+        const channels = ($('.container-all').attr('data-channels')).split(',')
+        console.log(channels)
+        $.ajax({
+            type: "POST",
+            url: "/refresh_all",
+            data: {
+                'channel0': channels[0],
+                'channel1': channels[1],
+                'channel2': channels[2],
+                'channel3': channels[3],
+                'channel4': channels[4],
+                'channel5': channels[5]
+            },
+            success: function(data, status, xhr) {
+                $(".container-all").empty()
+                for (var i = 0; i < data.length; i++) {
+                    $(".container-all").append(`
+                        <p style="color:aliceblue">
+                            ${channels[i]}
+                        </p>
+                        <p>
+                            ${data[i]}
+                        </p>
+                        `)
+                    console.log(`response status code: ${xhr.status} | response text: ${xhr.responseText}`)
+                }
+
+            },
+            error: function(xhr, status, error) {
+                // Handle errors
+                console.log(`response status code: ${xhr.status} | response text: ${xhr.responseText}`)
+            }
+        })
+
+    }
     $(document).ready(function() {
-        const intervalId = setInterval(forceReload, 60000)
+        crawlData3()
+        const intervalId = setInterval(crawlData3, 120000)
 
     })
 </script>

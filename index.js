@@ -60,38 +60,11 @@ async function main() {
     })
 
     app.get('/e1tv_all', (req, res) => {
-        const channels = ['esport1tv', 'esport2tv', 'esport3tv', 'esport4tv']
-        var ejsdata = []
-
-        scraper(channels[0]).then(el0 => {
-            ejsdata.push({
-                channel: channels[0],
-                viewers: el0.msg
-            })
-            scraper(channels[1]).then(el1 => {
-                ejsdata.push({
-                    channel: channels[1],
-                    viewers: el1.msg
-                })
-                scraper(channels[2]).then(el2 => {
-                    ejsdata.push({
-                        channel: channels[2],
-                        viewers: el2.msg
-                    })
-                    scraper(channels[3]).then(el3 => {
-                        ejsdata.push({
-                            channel: channels[3],
-                            viewers: el3.msg
-                        })
-                        console.log(ejsdata)
-                        res.render('e1tv_all', { ejsdata })
-                    })
-                })
-            })
-        })
-
-
-
+        const channels = ['esport1tv', 'esport2tv', 'esport3tv', 'esport4tv', 'esport1gg', 'esport1tv']
+        const ejsdata = {
+            channels: channels
+        }
+        res.render('e1tv_all', { ejsdata })
     })
 
     // POST REQUESTS
@@ -121,6 +94,32 @@ async function main() {
             yTscraper(channels[1]).then(el1 => {
                 data.push(el1.msg)
                 res.send(data).status(200)
+            })
+        })
+
+    })
+
+    app.post('/refresh_all', (req, res) => {
+        const channels = [req.body.channel0, req.body.channel1, req.body.channel2, req.body.channel3, req.body.channel4, req.body.channel5]
+        console.log(channels)
+        scraper(channels[0]).then(el0 => {
+            var data = []
+            data.push(el0.msg)
+            scraper(channels[1]).then(el1 => {
+                data.push(el1.msg)
+                scraper(channels[2]).then(el2 => {
+                    data.push(el2.msg)
+                    scraper(channels[3]).then(el3 => {
+                        data.push(el3.msg)
+                        yTscraper(channels[4]).then(el4 => {
+                            data.push(el4.msg)
+                            yTscraper(channels[5]).then(el5 => {
+                                data.push(el5.msg)
+                                res.send(data).status(200)
+                            })
+                        })
+                    })
+                })
             })
         })
 
@@ -167,7 +166,7 @@ async function scraper(channel) {
 
         await page.setCookie(...cookies)
             // await page.reload({waitUntil: ["networkidle2", "domcontentloaded"]})
-        await page.setDefaultTimeout(1000)
+        await page.setDefaultTimeout(2000)
         try {
             await page.waitForSelector('[data-a-target="animated-channel-viewers-count"]')
             var viewers = await page.$eval('[data-a-target="animated-channel-viewers-count"]', el => el.textContent)
@@ -178,6 +177,7 @@ async function scraper(channel) {
                 status: 200
             })
         } catch (e) {
+            await browser.close()
             console.log('viewers on ' + channel + ': ' + 'offline')
             return resolve({
                 msg: 'offline',
@@ -234,5 +234,5 @@ async function yTscraper(channel) {
 }
 
 function getVersionNumber() {
-    return '0.1.0'
+    return '0.4.0'
 }
