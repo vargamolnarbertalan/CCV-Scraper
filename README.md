@@ -4,7 +4,7 @@ This application allows you to get the CCV for any Twitch or YouTube channel. Th
 
 > Only available as a dockerized Linux app at the moment.
 
-## Usage
+## Installation
 
 Clone or download this repository as a zip. Inside the cloned/unpacked folder run the following commands:
 ```
