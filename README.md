@@ -7,9 +7,9 @@ This application allows you to get the CCV for any Twitch or YouTube channel. Th
 ## Usage
 
 Clone or download this repository as a zip. Inside the cloned/unpacked folder run the following commands:
-`docker build -t ccv_scraper .`
+```docker build -t ccv_scraper .```
 and
-`docker run --name ccv_scraper -p 12024:12024 --restart always ccv_scraper`
+```docker run --name ccv_scraper -p 12024:12024 --restart always ccv_scraper```
 
 ## Usage
 
