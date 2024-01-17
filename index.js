@@ -143,9 +143,9 @@ async function scraper(channel) {
         const browser = await puppeteer.launch({
             headless: 'new', // 'new', false
             defaultViewport: null,
-            args: ['--start-maximized'],
-            executablePath: __dirname + '/Chrome/Application/chrome.exe' // Windows
-                // executablePath: '/usr/bin/google-chrome-stable' // Linux
+            args: ['--start-maximized', '--no-sandbox'],
+            // executablePath: __dirname + '/Chrome/Application/chrome.exe' // Windows
+            executablePath: '/usr/bin/google-chrome-stable' // Linux
         });
         const cookies = [{
             'name': 'auth-token',
@@ -166,7 +166,7 @@ async function scraper(channel) {
 
         await page.setCookie(...cookies)
             // await page.reload({waitUntil: ["networkidle2", "domcontentloaded"]})
-        await page.setDefaultTimeout(2000)
+        await page.setDefaultTimeout(5000)
         try {
             await page.waitForSelector('[data-a-target="animated-channel-viewers-count"]')
             var viewers = await page.$eval('[data-a-target="animated-channel-viewers-count"]', el => el.textContent)
@@ -196,9 +196,9 @@ async function yTscraper(channel) {
         const browser = await puppeteer.launch({
             headless: 'new', // 'new', false
             defaultViewport: null,
-            args: ['--start-maximized'],
-            executablePath: __dirname + '/Chrome/Application/chrome.exe' // Windows
-                // executablePath: '/usr/bin/google-chrome-stable' // Linux
+            args: ['--start-maximized', '--no-sandbox'],
+            //executablePath: __dirname + '/Chrome/Application/chrome.exe' // Windows
+            executablePath: '/usr/bin/google-chrome-stable' // Linux
         })
 
         var [page] = await browser.pages()
@@ -208,7 +208,7 @@ async function yTscraper(channel) {
         await page.waitForSelector('form:nth-child(3) > div > div > button')
         await page.click('form:nth-child(3) > div > div > button')
 
-        await page.setDefaultTimeout(5000)
+        await page.setDefaultTimeout(10000)
         try {
             await page.waitForSelector('[overlay-style="LIVE"]')
             await page.click('[overlay-style="LIVE"]')
@@ -231,8 +231,4 @@ async function yTscraper(channel) {
         })
 
     })
-}
-
-function getVersionNumber() {
-    return '0.4.0'
 }
