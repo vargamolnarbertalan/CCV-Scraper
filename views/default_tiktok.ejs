@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCV for
+        <%=ejsdata.channel%>
+    </title>
+    <link rel="stylesheet" href="/css/normalize.css">
+    <link rel="stylesheet" href="/css/generic.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@600&display=swap" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+</head>
+
+<body>
+
+    <div class="container" data-channel="<%=ejsdata.channel%>">
+        <p style="color:aliceblue">
+            Loading
+        </p>
+        <p>
+
+        </p>
+    </div>
+
+
+
+</body>
+
+<script>
+    function forceReload() {
+        location.reload()
+    }
+
+    function crawlData() {
+        const channel = $('.container').attr('data-channel')
+        console.log(channel)
+        $.ajax({
+            type: "POST",
+            url: "/refresh_tiktok",
+            data: {
+                'channel': channel
+            },
+            success: function(data, status, xhr) {
+                $(".container > p:nth-child(1)").text(channel)
+                $(".container > p:nth-child(2)").text(data)
+                console.log(`response status code: ${xhr.status} | response text: ${xhr.responseText}`)
+            },
+            error: function(xhr, status, error) {
+                // Handle errors
+                console.log(`response status code: ${xhr.status} | response text: ${xhr.responseText}`)
+            }
+        })
+    }
+    $(document).ready(function() {
+        crawlData()
+        const intervalId = setInterval(crawlData, 90000)
+
+    })
+</script>
+
+</html>

@@ -5,6 +5,14 @@ const bodyParser = require('body-parser')
 
 const PORT = 12024
 
+const browserProps = {
+    headless: 'new', // 'new', false
+    defaultViewport: null,
+    args: ['--start-maximized', '--no-sandbox'],
+    //executablePath: __dirname + '/Chrome/Application/chrome.exe' // Windows
+    executablePath: '/usr/bin/google-chrome-stable' // Linux
+}
+
 // MAIN FUNCTION CALL
 
 ;
@@ -51,12 +59,30 @@ async function main() {
         }
     })
 
+    app.get('/tiktok/:channel', (req, res) => {
+        const channel = req.params.channel
+        if (channel != 'favicon.ico') {
+            const ejsdata = {
+                channel: channel
+            }
+            res.render('default_tiktok', { ejsdata })
+        }
+    })
+
     app.get('/twitch/:channel/yt/:channel2', (req, res) => {
         const channels = [req.params.channel, req.params.channel2]
         const ejsdata = {
             channels: channels
         }
         res.render('yt_twitch', { ejsdata })
+    })
+
+    app.get('/twitch/:channel/yt/:channel2/tiktok/:channel3', (req, res) => {
+        const channels = [req.params.channel, req.params.channel2, req.params.channel3]
+        const ejsdata = {
+            channels: channels
+        }
+        res.render('yt_twitch_tiktok', { ejsdata })
     })
 
     app.get('/e1tv_all', (req, res) => {
@@ -85,6 +111,14 @@ async function main() {
         })
     })
 
+    app.post('/refresh_tiktok', (req, res) => {
+        const channel = req.body.channel
+        //onsole.log(channel)
+        tiktokScraper(channel).then(el => {
+            res.send(el.msg).status(200)
+        })
+    })
+
     app.post('/refresh_duo', (req, res) => {
         const channels = [req.body.channel0, req.body.channel1]
         console.log(channels)
@@ -97,6 +131,22 @@ async function main() {
             })
         })
 
+    })
+
+    app.post('/refresh_trio', (req, res) => {
+        const channels = [req.body.channel0, req.body.channel1, req.body.channel2]
+        console.log(channels)
+        scraper(channels[0]).then(el0 => {
+            var data = []
+            data.push(el0.msg)
+            yTscraper(channels[1]).then(el1 => {
+                data.push(el1.msg)
+                tiktokScraper(channels[2]).then(el2 =>{
+                    data.push(el2.msg)
+                    res.send(data).status(200)
+                })
+            })
+        })
     })
 
     app.post('/refresh_all', (req, res) => {
@@ -140,13 +190,9 @@ async function scraper(channel) {
         const authToken = ""
 
         console.log('checking view count on ' + channel)
-        const browser = await puppeteer.launch({
-            headless: 'new', // 'new', false
-            defaultViewport: null,
-            args: ['--start-maximized', '--no-sandbox'],
-            // executablePath: __dirname + '/Chrome/Application/chrome.exe' // Windows
-            executablePath: '/usr/bin/google-chrome-stable' // Linux
-        });
+        const browser = await puppeteer.launch(
+            browserProps
+        );
         const cookies = [{
             'name': 'auth-token',
             'value': authToken
@@ -193,13 +239,7 @@ async function yTscraper(channel) {
         const authToken = ""
 
         console.log('checking view count on ' + channel + ' YT')
-        const browser = await puppeteer.launch({
-            headless: 'new', // 'new', false
-            defaultViewport: null,
-            args: ['--start-maximized', '--no-sandbox'],
-            //executablePath: __dirname + '/Chrome/Application/chrome.exe' // Windows
-            executablePath: '/usr/bin/google-chrome-stable' // Linux
-        })
+        const browser = await puppeteer.launch(browserProps)
 
         var [page] = await browser.pages()
         await page.goto('https://www.youtube.com/@' + channel + '/streams')
@@ -230,5 +270,37 @@ async function yTscraper(channel) {
             status: 200
         })
 
+    })
+}
+
+async function tiktokScraper(channel) {
+    return new Promise(async (resolve, reject) => {
+        console.log('checking view count on ' + channel + ' TikTok')
+        const browser = await puppeteer.launch(browserProps)
+
+        var [page] = await browser.pages()
+        await page.goto('https://www.tiktok.com/@' + channel + '/live')
+
+        await page.setViewport({ width: 1280, height: 720 })
+
+        await page.setDefaultTimeout(15000)
+        try{
+            await page.waitForSelector('div[class*="DivPeopleCounter"]')
+            var viewers = await page.$eval('div[class*="DivPeopleCounter"]', el => el.textContent)
+            await browser.close()
+            console.log('viewers on ' + channel + ' tiktok: ' + viewers)
+            return resolve({
+                msg: viewers,
+                status: 200
+            })
+        }catch(e){
+            console.log(e)
+            await browser.close()
+            console.log('viewers on ' + channel + ': ' + 'offline')
+            return resolve({
+                msg: 'offline',
+                status: 200
+            })
+        }
     })
 }

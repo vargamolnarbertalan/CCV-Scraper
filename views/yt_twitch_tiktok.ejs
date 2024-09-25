@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCV for 3 channels
+    </title>
+    <link rel="stylesheet" href="/css/normalize.css">
+    <link rel="stylesheet" href="/css/generic.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@600&display=swap" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+</head>
+
+<body>
+
+    <div class="container-trio" data-channels="<%=ejsdata.channels%>">
+        <p style="color:aliceblue">
+            Loading
+        </p>
+        <p>
+
+        </p>
+    </div>
+
+
+
+</body>
+
+<script>
+    function forceReload() {
+        location.reload()
+    }
+
+    function crawlData3() {
+        const channels = ($('.container-trio').attr('data-channels')).split(',')
+        console.log(channels)
+        $.ajax({
+            type: "POST",
+            url: "/refresh_trio",
+            data: {
+                'channel0': channels[0],
+                'channel1': channels[1],
+                'channel2': channels[2]
+            },
+            success: function(data, status, xhr) {
+                $(".container-trio").empty()
+                for (var i = 0; i < data.length; i++) {
+                    $(".container-trio").append(`
+                        <p style="color:aliceblue">
+                            ${channels[i]}
+                        </p>
+                        <p>
+                            ${data[i]}
+                        </p>
+                        `)
+                    console.log(`response status code: ${xhr.status} | response text: ${xhr.responseText}`)
+                }
+
+            },
+            error: function(xhr, status, error) {
+                // Handle errors
+                console.log(`response status code: ${xhr.status} | response text: ${xhr.responseText}`)
+            }
+        })
+
+    }
+    $(document).ready(function() {
+        crawlData3()
+        const intervalId = setInterval(crawlData3, 120000)
+
+    })
+</script>
+
+</html>

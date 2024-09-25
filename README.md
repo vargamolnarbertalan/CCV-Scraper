@@ -30,6 +30,7 @@ There's no GUI, the only way to control the application is to pass channel names
 - **ip:port/twitch/{twitch_channelname}** ---> Renders the CCV for a single Twitch channel. Updates every 90 seconds.
 - **ip:port/yt/{yt_channelname}** ---> Renders the CCV for a single YouTube channel. Updates every 90 seconds.
 - **ip:port/twitch/{twitch\_channelname}/yt/{yt\_channelname}** ---> Renders the CCV for one Twitch and one YouTube channel.  Updates every 90 seconds.
+- **ip:port/twitch/{twitch\_channelname}/yt/{yt\_channelname}/tiktok/{tiktok\_channelname}** ---> Renders the CCV for one Twitch, one YouTube, and one TikTok channel.  Updates every 120 seconds.
 - **ip:port/e1tv_all** ---> Renders the CCV for esport1tv, esport2tv, esport3tv, esport4tv Twitch and esport1gg, esport1tv YouTube channels. Updates every 2 minutes.
 
 ### *Please note*
