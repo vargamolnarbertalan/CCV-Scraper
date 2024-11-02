@@ -1,0 +1,8 @@
+version: "3"
+services:
+  ccv_scarper:
+    build: .
+    container_name: ccv_scrapet
+    restart: always
+    ports:
+      - "12024:12024"

@@ -1,5 +1,5 @@
 # Use an official Node.js runtime as a base image
-FROM node:21
+FROM node:20.10.0
 
 # Set the working directory in the container
 WORKDIR /usr/src/app
@@ -12,7 +12,7 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --d
     && apt-get update && apt-get install -y google-chrome-stable
 
 # Install app dependencies
-RUN npm install
+# RUN npm install
 
 # Bundle app source
 COPY . .

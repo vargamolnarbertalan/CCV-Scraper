@@ -199,6 +199,16 @@ async function scraper(channel) {
         }]
 
         var [page] = await browser.pages()
+        //BLOCKING HEAVY TRAFFIC
+        await page.setRequestInterception(true)
+        page.on('request', request => {
+            if (request.resourceType() === 'image' || request.resourceType() === 'font') {
+                request.abort()
+            } else {
+                request.continue()
+            }
+        })
+        ///////////////
         await page.goto('https://twitch.tv/' + channel)
         await page.evaluate(() => {
             localStorage.setItem('mature', 'true')
@@ -212,7 +222,7 @@ async function scraper(channel) {
 
         await page.setCookie(...cookies)
             // await page.reload({waitUntil: ["networkidle2", "domcontentloaded"]})
-        await page.setDefaultTimeout(5000)
+        await page.setDefaultTimeout(15000)
         try {
             await page.waitForSelector('[data-a-target="animated-channel-viewers-count"]')
             var viewers = await page.$eval('[data-a-target="animated-channel-viewers-count"]', el => el.textContent)
@@ -242,13 +252,23 @@ async function yTscraper(channel) {
         const browser = await puppeteer.launch(browserProps)
 
         var [page] = await browser.pages()
+        //BLOCKING HEAVY TRAFFIC
+        await page.setRequestInterception(true)
+        page.on('request', request => {
+            if (request.resourceType() === 'image' || request.resourceType() === 'font') {
+                request.abort()
+            } else {
+                request.continue()
+            }
+        })
+        ///////////////
         await page.goto('https://www.youtube.com/@' + channel + '/streams')
 
         await page.setViewport({ width: 1280, height: 720 })
         await page.waitForSelector('form:nth-child(3) > div > div > button')
         await page.click('form:nth-child(3) > div > div > button')
 
-        await page.setDefaultTimeout(10000)
+        await page.setDefaultTimeout(15000)
         try {
             await page.waitForSelector('[overlay-style="LIVE"]')
             await page.click('[overlay-style="LIVE"]')
@@ -279,11 +299,19 @@ async function tiktokScraper(channel) {
         const browser = await puppeteer.launch(browserProps)
 
         var [page] = await browser.pages()
+        //BLOCKING HEAVY TRAFFIC
+        await page.setRequestInterception(true)
+        page.on('request', request => {
+            if (request.resourceType() === 'image' || request.resourceType() === 'font') {
+                request.abort()
+            } else {
+                request.continue()
+            }
+        })
+        await page.setDefaultTimeout(40000)
+        ///////////////
         await page.goto('https://www.tiktok.com/@' + channel + '/live')
-
         await page.setViewport({ width: 1280, height: 720 })
-
-        await page.setDefaultTimeout(15000)
         try{
             await page.waitForSelector('div[class*="DivPeopleCounter"]')
             var viewers = await page.$eval('div[class*="DivPeopleCounter"]', el => el.textContent)
