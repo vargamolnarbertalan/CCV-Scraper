@@ -12,7 +12,7 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --d
     && apt-get update && apt-get install -y google-chrome-stable
 
 # Install app dependencies
-RUN npm install express
+RUN npm ci
 
 # Bundle app source
 COPY . .
