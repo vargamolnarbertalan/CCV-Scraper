@@ -2,7 +2,7 @@ version: "3"
 services:
   ccv_scarper:
     build: .
-    container_name: ccv_scrapet
+    container_name: ccv_scraper
     restart: always
     ports:
       - "12024:12024"
