@@ -9,8 +9,9 @@ const browserProps = {
     headless: 'new', // 'new', false
     defaultViewport: null,
     args: ['--start-maximized', '--no-sandbox'],
+    //defaultBrowser: 'firefox'
     //executablePath: __dirname + '/Chrome/Application/chrome.exe' // Windows
-    executablePath: '/usr/bin/google-chrome-stable' // Linux
+    //executablePath: '/usr/bin/google-chrome-stable' // Linux
 }
 
 // MAIN FUNCTION CALL
