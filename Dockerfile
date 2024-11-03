@@ -1,8 +1,8 @@
-# Use an official Node.js runtime as a base image
-FROM node:20.10.0
+# Use a base puppeteer image
+FROM ghcr.io/puppeteer/puppeteer:latest
 
 # Set the working directory in the container
-WORKDIR /usr/src/app
+WORKDIR /usr/src/app/ccv
 
 # Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
