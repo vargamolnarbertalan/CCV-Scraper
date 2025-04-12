@@ -6,7 +6,7 @@ const bodyParser = require('body-parser')
 const PORT = 12024
 
 const browserProps = {
-    headless: 'new', // 'new', false
+    headless: false, // 'new', false
     defaultViewport: null,
     args: ['--start-maximized', '--no-sandbox'],
     //defaultBrowser: 'firefox'
@@ -316,7 +316,7 @@ async function tiktokScraper(channel) {
         try{
             await page.waitForSelector('div[class*="DivPeopleCounter"]')
             var viewers = await page.$eval('div[class*="DivPeopleCounter"]', el => el.textContent)
-            await browser.close()
+            //await browser.close()
             console.log('viewers on ' + channel + ' tiktok: ' + viewers)
             return resolve({
                 msg: viewers,
@@ -324,7 +324,7 @@ async function tiktokScraper(channel) {
             })
         }catch(e){
             console.log(e)
-            await browser.close()
+            //await browser.close()
             console.log('viewers on ' + channel + ': ' + 'offline')
             return resolve({
                 msg: 'offline',
