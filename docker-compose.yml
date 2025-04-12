@@ -1,8 +1,7 @@
-version: "3"
 services:
   ccv_scarper:
     build: .
     container_name: ccv_scraper
-    restart: always
+    restart: unless-stopped
     ports:
       - "12024:12024"
